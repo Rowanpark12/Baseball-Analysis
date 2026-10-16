@@ -1,0 +1,197 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyNHAzlZwsouv/DQ60GEJeY7",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Rowanpark12/Baseball-Analysis/blob/main/Baseball_AI_Agent\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 52,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "bsDJB6Oeo3Vx",
+        "outputId": "44af43d1-5140-4aa7-c55e-ebaeb7dc52be"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: pybaseball in /usr/local/lib/python3.13/dist-packages (2.2.7)\n",
+            "Requirement already satisfied: anthropic in /usr/local/lib/python3.13/dist-packages (1.15.0)\n",
+            "Requirement already satisfied: numpy>=1.13.0 in /usr/local/lib/python3.13/dist-packages (from pybaseball) (2.1.3)\n",
+            "Requirement already satisfied: pandas>=1.0.3 in /usr/local/lib/python3.13/dist-packages (from pybaseball) (2.2.3)\n",
+            "Requirement already satisfied: beautifulsoup4>=4.4.0 in /usr/local/lib/python3.13/dist-packages (from pybaseball) (4.13.5)\n",
+            "Requirement already satisfied: requests>=2.18.1 in /usr/local/lib/python3.13/dist-packages (from pybaseball) (2.32.4)\n",
+            "Requirement already satisfied: lxml>=4.2.1 in /usr/local/lib/python3.13/dist-packages (from pybaseball) (6.1.3)\n",
+            "Requirement already satisfied: pyarrow>=1.0.1 in /usr/local/lib/python3.13/dist-packages (from pybaseball) (23.0.1)\n",
+            "Requirement already satisfied: pygithub>=1.51 in /usr/local/lib/python3.13/dist-packages (from pybaseball) (2.10.0)\n",
+            "Requirement already satisfied: scipy>=1.4.0 in /usr/local/lib/python3.13/dist-packages (from pybaseball) (1.16.3)\n",
+            "Requirement already satisfied: matplotlib>=2.0.0 in /usr/local/lib/python3.13/dist-packages (from pybaseball) (3.10.0)\n",
+            "Requirement already satisfied: tqdm>=4.50.0 in /usr/local/lib/python3.13/dist-packages (from pybaseball) (4.67.3)\n",
+            "Requirement already satisfied: attrs>=20.3.0 in /usr/local/lib/python3.13/dist-packages (from pybaseball) (26.1.0)\n",
+            "Requirement already satisfied: anyio<5,>=4.1.0 in /usr/local/lib/python3.13/dist-packages (from anthropic) (4.15.1)\n",
+            "Requirement already satisfied: docstring-parser<1,>=0.15 in /usr/local/lib/python3.13/dist-packages (from anthropic) (0.18.0)\n",
+            "Requirement already satisfied: httpx2<3,>=2.0.0 in /usr/local/lib/python3.13/dist-packages (from anthropic) (2.13.1)\n",
+            "Requirement already satisfied: jiter<1,>=0.4.0 in /usr/local/lib/python3.13/dist-packages (from anthropic) (0.17.0)\n",
+            "Requirement already satisfied: opentelemetry-api<2,>=1.1.0 in /usr/local/lib/python3.13/dist-packages (from anthropic) (1.42.1)\n",
+            "Requirement already satisfied: pydantic<3,>=1.10.0 in /usr/local/lib/python3.13/dist-packages (from anthropic) (2.13.5)\n",
+            "Requirement already satisfied: sniffio<2,>=1 in /usr/local/lib/python3.13/dist-packages (from anthropic) (1.3.1)\n",
+            "Requirement already satisfied: typing-extensions<5,>=4.14 in /usr/local/lib/python3.13/dist-packages (from anthropic) (4.16.0)\n",
+            "Requirement already satisfied: idna>=2.8 in /usr/local/lib/python3.13/dist-packages (from anyio<5,>=4.1.0->anthropic) (3.20)\n",
+            "Requirement already satisfied: soupsieve>1.2 in /usr/local/lib/python3.13/dist-packages (from beautifulsoup4>=4.4.0->pybaseball) (2.10)\n",
+            "Requirement already satisfied: httpcore2==2.13.1 in /usr/local/lib/python3.13/dist-packages (from httpx2<3,>=2.0.0->anthropic) (2.13.1)\n",
+            "Requirement already satisfied: truststore>=0.10 in /usr/local/lib/python3.13/dist-packages (from httpx2<3,>=2.0.0->anthropic) (0.10.4)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.13/dist-packages (from httpcore2==2.13.1->httpx2<3,>=2.0.0->anthropic) (0.16.0)\n",
+            "Requirement already satisfied: contourpy>=1.0.1 in /usr/local/lib/python3.13/dist-packages (from matplotlib>=2.0.0->pybaseball) (1.4.0)\n",
+            "Requirement already satisfied: cycler>=0.10 in /usr/local/lib/python3.13/dist-packages (from matplotlib>=2.0.0->pybaseball) (0.12.1)\n",
+            "Requirement already satisfied: fonttools>=4.22.0 in /usr/local/lib/python3.13/dist-packages (from matplotlib>=2.0.0->pybaseball) (4.66.1)\n",
+            "Requirement already satisfied: kiwisolver>=1.3.1 in /usr/local/lib/python3.13/dist-packages (from matplotlib>=2.0.0->pybaseball) (1.5.1)\n",
+            "Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.13/dist-packages (from matplotlib>=2.0.0->pybaseball) (26.3)\n",
+            "Requirement already satisfied: pillow>=8 in /usr/local/lib/python3.13/dist-packages (from matplotlib>=2.0.0->pybaseball) (11.3.0)\n",
+            "Requirement already satisfied: pyparsing>=2.3.1 in /usr/local/lib/python3.13/dist-packages (from matplotlib>=2.0.0->pybaseball) (3.3.3)\n",
+            "Requirement already satisfied: python-dateutil>=2.7 in /usr/local/lib/python3.13/dist-packages (from matplotlib>=2.0.0->pybaseball) (2.9.0.post0)\n",
+            "Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.13/dist-packages (from pandas>=1.0.3->pybaseball) (2025.2)\n",
+            "Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.13/dist-packages (from pandas>=1.0.3->pybaseball) (2026.4)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.13/dist-packages (from pydantic<3,>=1.10.0->anthropic) (0.8.0)\n",
+            "Requirement already satisfied: pydantic-core==2.46.5 in /usr/local/lib/python3.13/dist-packages (from pydantic<3,>=1.10.0->anthropic) (2.46.5)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.13/dist-packages (from pydantic<3,>=1.10.0->anthropic) (0.4.4)\n",
+            "Requirement already satisfied: pynacl>=1.4.0 in /usr/local/lib/python3.13/dist-packages (from pygithub>=1.51->pybaseball) (1.6.2)\n",
+            "Requirement already satisfied: pyjwt>=2.4.0 in /usr/local/lib/python3.13/dist-packages (from pyjwt[crypto]>=2.4.0->pygithub>=1.51->pybaseball) (2.15.1)\n",
+            "Requirement already satisfied: urllib3>=1.26.0 in /usr/local/lib/python3.13/dist-packages (from pygithub>=1.51->pybaseball) (2.5.0)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.13/dist-packages (from requests>=2.18.1->pybaseball) (3.4.9)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.13/dist-packages (from requests>=2.18.1->pybaseball) (2026.7.22)\n",
+            "Requirement already satisfied: cryptography>=3.4.0 in /usr/local/lib/python3.13/dist-packages (from pyjwt[crypto]>=2.4.0->pygithub>=1.51->pybaseball) (50.0.2)\n",
+            "Requirement already satisfied: cffi>=2.0.0 in /usr/local/lib/python3.13/dist-packages (from pynacl>=1.4.0->pygithub>=1.51->pybaseball) (2.1.1)\n",
+            "Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.13/dist-packages (from python-dateutil>=2.7->matplotlib>=2.0.0->pybaseball) (1.17.0)\n",
+            "Requirement already satisfied: pycparser in /usr/local/lib/python3.13/dist-packages (from cffi>=2.0.0->pynacl>=1.4.0->pygithub>=1.51->pybaseball) (3.0)\n"
+          ]
+        }
+      ],
+      "source": [
+        "! pip install pybaseball anthropic\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "VhJkOpckpdEa",
+        "outputId": "87f4c5f5-eccb-45f2-9287-326be05a9150"
+      },
+      "execution_count": 57,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Gathering Player Data\n",
+            "shota imanaga, 2025-09-01 to 2025-09-30, 423 pitches:\n",
+            "                 pitches  avg_velo  avg_spin  swings  whiffs  usage_%  whiff_%\n",
+            "pitch_name                                                                    \n",
+            "4-Seam Fastball      173      91.0    2499.2      82       8     40.9      9.8\n",
+            "Split-Finger         132      83.5    1340.9      76      27     31.2     35.5\n",
+            "Sweeper               98      80.6    2535.2      58      18     23.2     31.0\n",
+            "Sinker                16      88.5    1735.9      10       2      3.8     20.0\n",
+            "Slider                 4      82.3    2465.8       4       3      0.9     75.0\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "SRNERsEvswMW"
+      },
+      "execution_count": 58,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "Qm27Le3Tt-5t"
+      },
+      "execution_count": 62,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "QRcGkyeYuFcI",
+        "outputId": "834e2f59-83e0-4706-cb5b-794afc092a96"
+      },
+      "execution_count": 63,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "  [agent is calling pitcher_report with {'last_name': 'Imanaga', 'first_name': 'Shota', 'start_date': '2025-04-01', 'end_date': '2025-04-30'}]\n",
+            "Gathering Player Data\n",
+            "  [agent is calling pitcher_report with {'last_name': 'Imanaga', 'first_name': 'Shota', 'start_date': '2025-09-01', 'end_date': '2025-09-30'}]\n",
+            "Gathering Player Data\n",
+            "From April to September, Imanaga leaned more on his sweeper and less on his four-seamer: sweeper usage rose from 11.2% to 23.2%, and four-seam usage fell from 49.8% to 40.9%. His split-finger usage dipped slightly (34.8% to 31.2%) but became more effective, with its whiff rate rising from 26.4% to 35.5%. The sweeper's whiff rate fell from 47.4% to 31.0%, so it's worth checking whether the heavier usage is coming at the cost of its effectiveness.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(ask(\"how effective was drew rassmussens cutter?\"))\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "-zcYfB8Ru-Xo",
+        "outputId": "acdcb914-a0a3-4ed0-ea98-dc0224cfc24f"
+      },
+      "execution_count": 65,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "  [agent is calling pitcher_report with {'last_name': 'Rasmussen', 'first_name': 'Drew', 'start_date': '2025-03-01', 'end_date': '2025-10-31'}]\n",
+            "Gathering Player Data\n",
+            "Drew Rasmussen's cutter was his most effective swing-and-miss pitch in 2025 (March 1 to October 31, my assumed range). It got a 24.8% whiff rate on 728 pitches, the best among his main pitches, versus 19.6% for his four-seamer and 10.8% for his sinker. It's worth keeping as a primary weapon, with his 31.4% usage backing that up.\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
